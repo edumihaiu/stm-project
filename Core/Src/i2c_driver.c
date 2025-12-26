@@ -64,9 +64,11 @@ void I2C_stop(I2C_TypeDef* i2cx) {
 }
 
 void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size) {
+	slaveAddress = slaveAddress << 1;
+
 	I2C_start(i2cx);
 	I2C_sendAddr(i2cx, slaveAddress);
-	I2C1_writedata(startReg);
+	I2C_writeData(i2cx, startReg);
 
 	I2C_start(i2cx);
 
@@ -74,11 +76,12 @@ void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, ui
 	while(!(i2cx->SR1 & (1 << 1)));
 	i2cx->CR1 |= (1 << 10);
 	uint8_t temp = i2cx->SR1 | i2cx->SR2;
+	(void)temp;
 
 	for (size_t i = 0; i < size; i++) {
 		if (i == size - 1) {
 			i2cx->CR1 &= ~(1 << 10); //NACK
-			I2C1_stop(i2cx);
+			I2C_stop(i2cx);
 		}
 		while (!(i2cx->SR1 & (1 << 6)));
 		buffer[i] = i2cx->DR;
