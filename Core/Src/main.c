@@ -2,12 +2,19 @@
 #include "stm32f4xx.h"
 #include "mpu6050.h"
 #include "uart_driver.h"
+#include "imu_math.h"
+#include "leds.h"
 
 MPU_axis data;
 
 
+void FPU_enable(void) {
+    SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
+}
+
 int main(void)
 {
+	FPU_enable();
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 	MPU_init(I2C1);
 	UART_init();
@@ -31,14 +38,10 @@ int main(void)
 		{
 			GPIOC->ODR &= ~(1 << 13);
 		}
-		UART_print("-------------\n");
-		UART_print(itoa(data.X, buffer, 10));
-		UART_write('\n');
-		UART_print(itoa(data.Y, buffer, 10));
-		UART_write('\n');
-		UART_print(itoa(data.Z, buffer, 10));
-		UART_write('\n');
-		UART_print("-------------\n");
+
+
+		//
+		UART_printXYZ(&data);
 		for(volatile int i = 0; i < 2000000; i++);
 
 	}

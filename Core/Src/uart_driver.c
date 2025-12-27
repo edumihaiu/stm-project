@@ -7,8 +7,9 @@
 
 
 #include "uart_driver.h"
+#include "mpu6050.h"
 
-void UART_init(void)
+void UART_init(void) // USART1 PA9 PA10
 {
 	RCC->AHB1ENR |= (1 << 0); // enable clock PORTA
 	RCC->APB2ENR |= (1 << 4); // enable clock USART1
@@ -42,4 +43,38 @@ void UART_write(char c)
 void UART_print(char* str)
 {
 	while(*str) UART_write(*str++);
+}
+
+void UART_printNumber(int16_t num)
+{
+	char buffer[20];
+	if (num == 0)
+	{
+		UART_write('0');
+		return;
+	}
+	if (num < 0)
+	{
+		UART_write('-');
+		num = -num;
+	}
+	int i = 0;
+	while (num)
+	{
+		buffer[i++] = (num % 10) + '0';
+		num /= 10;
+	}
+	while(i--) UART_write(buffer[i]);
+}
+
+void UART_printXYZ(MPU_axis* data)
+{
+	UART_print("-------------\r\n");
+	UART_printNumber(data->X);
+	UART_write('\n');
+	UART_printNumber(data->Y);
+	UART_write('\n');
+	UART_printNumber(data->Z);
+	UART_write('\n');
+	UART_print("-------------\r\n");
 }

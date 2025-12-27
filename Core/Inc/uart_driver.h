@@ -15,5 +15,6 @@
 void UART_init(void);
 void UART_write(char c);
 void UART_print(char* str);
+void UART_printNumber(int16_t num);
 
 #endif /* INC_UART_DRIVER_H_ */
