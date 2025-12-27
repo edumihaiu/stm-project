@@ -2,7 +2,8 @@
 
 #define AF4 0x4
 
-void I2C_init(I2C_TypeDef* i2cx) {
+void I2C_init(I2C_TypeDef* i2cx)
+{
 	//SCL (PB6) SDA (PB7)
 	// clock enable
 	RCC->AHB1ENR |= (1 << 1); // PORTB clock enable
@@ -10,8 +11,8 @@ void I2C_init(I2C_TypeDef* i2cx) {
 
 	// setting SCL, SDA to alternate function mode
 	GPIOB->MODER &= ~(0xF << 12);
-	GPIOB->MODER |= (2 << 12); //  (10 is af mode)
-	GPIOB->MODER |= (2 << 14); //  (10 is af mode)
+	GPIOB->MODER |= (2U << 12); //  (10 is af mode)
+	GPIOB->MODER |= (2U << 14); //  (10 is af mode)
 
 	// setting SCL, SDA to output open drain
 	GPIOB->OTYPER &= ~(3 << 6);
@@ -20,6 +21,7 @@ void I2C_init(I2C_TypeDef* i2cx) {
 
 
 	// setting SCL, SDA to high speed outputs
+	GPIOB->OSPEEDR &= ~(0xF << 12);
 	GPIOB->OSPEEDR |= (3U << 12);
 	GPIOB->OSPEEDR |= (3U << 14);
 
@@ -38,19 +40,22 @@ void I2C_init(I2C_TypeDef* i2cx) {
 
 }
 
-void I2C_start(I2C_TypeDef* i2cx) {
+void I2C_start(I2C_TypeDef* i2cx)
+{
 	i2cx->CR1 |= (1 << 8);
 
 	while(!(i2cx->SR1 & (1 << 0)));
 }
 
-void I2C_writeData(I2C_TypeDef* i2cx, uint8_t data) {
+void I2C_writeData(I2C_TypeDef* i2cx, uint8_t data)
+{
 	i2cx->DR = data;
 
 	while(!(i2cx->SR1 & (1 << 2)));
 }
 
-void I2C_sendAddr(I2C_TypeDef* i2cx, uint8_t addr) {
+void I2C_sendAddr(I2C_TypeDef* i2cx, uint8_t addr)
+{
 	i2cx->DR = addr;
 
 	while(!(i2cx->SR1 & (1 << 1)));
@@ -59,11 +64,13 @@ void I2C_sendAddr(I2C_TypeDef* i2cx, uint8_t addr) {
 	(void)temp;
 }
 
-void I2C_stop(I2C_TypeDef* i2cx) {
+void I2C_stop(I2C_TypeDef* i2cx)
+{
 	i2cx->CR1 |= (1 << 9);
 }
 
-void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size) {
+void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size)
+{
 	slaveAddress = slaveAddress << 1;
 
 	I2C_start(i2cx);

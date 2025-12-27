@@ -11,7 +11,8 @@
 #include "mpu6050.h"
 
 
-void MPU_init(I2C_TypeDef* i2cx) {
+void MPU_init(I2C_TypeDef* i2cx)
+{
 	I2C_init(i2cx);
 	I2C_start(i2cx);
 	I2C_sendAddr(i2cx, MPU_address << 1);
@@ -20,7 +21,8 @@ void MPU_init(I2C_TypeDef* i2cx) {
 	I2C_stop(i2cx);
 }
 
-void MPU_readXYZ(I2C_TypeDef* i2cx, MPU_axis* dataStruct) {
+void MPU_readXYZ(I2C_TypeDef* i2cx, MPU_axis* dataStruct)
+{
 	uint8_t buffer[6];
 	I2C_burstRead(i2cx, MPU_address, MPU_startRegister, buffer, 6);
 

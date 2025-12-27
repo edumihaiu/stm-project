@@ -8,6 +8,12 @@
 #ifndef INC_UART_DRIVER_H_
 #define INC_UART_DRIVER_H_
 
+#include "stm32f4xx.h"
 
+#define AF7 0x7
+
+void UART_init(void);
+void UART_write(char c);
+void UART_print(char* str);
 
 #endif /* INC_UART_DRIVER_H_ */
