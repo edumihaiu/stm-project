@@ -6,27 +6,35 @@
  */
 
 #include "leds.h"
-
-void leds_init(int8_t numOfLeds, int8_t startPortNum) // portb leds
+uint8_t led_map[7] = {4, 3, 0, 1, 2, 5, 8};
+void leds_init(void) // portb leds
 {
-	GPIOB->MODER &= ~(0x3F); // reset Pb0,1,2
-	GPIOB->MODER |= (1U << 0);
-	GPIOB->MODER |= (1U << 2);
-	GPIOB->MODER |= (1U << 4);
+	GPIOB->MODER &= ~(0xFFF); // reset Pb0,1,2
+	GPIOB->MODER &= ~(3U << 16);
+	for (int i = 0; i < 7; i++)
+	{
+		uint8_t led = led_map[i];
+		GPIOB->MODER |= (1U << (led*2));
+	}
 }
 void leds_update(float angle)
 {
+	UART_print("angle: ");
+	UART_printNumber(angle);
     if (angle < -90) angle = -90;
     if (angle > 90)  angle = 90;
+    float step = 2.0f;
 
-    int index = (int)((angle + 30.0f) / 60.0f);
+    int index = (int)(angle / step) + 3;
 
-    if (index > 2) index = 2;
+    if (index > 6) index = 6;
     if (index < 0) index = 0;
 
-    GPIOB->ODR &= ~(7U);
+    uint8_t pin = led_map[index];
+    GPIOB->ODR &= ~(0x13F);
+
 
     // Pasul B: Aprindem DOAR led-ul calculat
     // Shiftam 1 la stanga cu 'index' pozitii
-    GPIOB->ODR |= (1 << index);
+    GPIOB->ODR |= (1 << pin);
 }

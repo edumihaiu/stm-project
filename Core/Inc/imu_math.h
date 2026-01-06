@@ -8,7 +8,10 @@
 #ifndef INC_IMU_MATH_H_
 #define INC_IMU_MATH_H_
 
-#define RAD_TO_DEG 57.29f
+#include "stm32f4xx.h"
+
+
+#define RAD_TO_DEG 57.2957795f
 
 typedef struct {
 	float roll;

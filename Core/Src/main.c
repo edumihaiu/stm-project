@@ -6,7 +6,7 @@
 #include "leds.h"
 
 MPU_axis data;
-
+Angles_t angles;
 
 void FPU_enable(void) {
     SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
@@ -20,7 +20,7 @@ int main(void)
 	UART_init();
 	GPIOC->MODER &= ~(3U << 26);
 	GPIOC->MODER |= (1U << 26);
-
+	leds_init();
 	while(1)
 	{
 		char buffer[10];
@@ -39,10 +39,11 @@ int main(void)
 			GPIOC->ODR &= ~(1 << 13);
 		}
 
-
+		calculateDegrees(&angles, data.X, data.Y, data.Z);
 		//
 		UART_printXYZ(&data);
-		for(volatile int i = 0; i < 2000000; i++);
+		leds_update(angles.roll);
+		for(volatile int i = 0; i < 100000; i++);
 
 	}
 	return 0;
