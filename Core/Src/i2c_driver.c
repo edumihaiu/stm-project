@@ -2,6 +2,7 @@
 
 #define AF4 GPIO_AFRL_AFSEL6_2
 #define I2C_CCR_VALUE 0x50UL
+#define I2C_TIMEOUT_VALUE 50000
 
 void I2C_init(I2C_TypeDef* i2cx)
 {
@@ -39,28 +40,42 @@ void I2C_init(I2C_TypeDef* i2cx)
 	i2cx->CR1 |= I2C_CR1_PE;
 }
 
-void I2C_start(I2C_TypeDef* i2cx)
+I2C_Status I2C_start(I2C_TypeDef* i2cx)
 {
+	uint32_t timeout = I2C_TIMEOUT_VALUE;
 	i2cx->CR1 |= I2C_CR1_START;
 
-	while(!(i2cx->SR1 & (1 << 0)));
+	while(!(i2cx->SR1 & I2C_SR1_SB)) {
+		if (--timeout == 0) return I2C_TIMEOUT;
+	}
+	return I2C_OK;
 }
 
-void I2C_writeData(I2C_TypeDef* i2cx, uint8_t data)
+I2C_Status I2C_writeData(I2C_TypeDef* i2cx, uint8_t data)
 {
+	uint32_t timeout = I2C_TIMEOUT_VALUE;
 	i2cx->DR = data;
 
-	while(!(i2cx->SR1 & (1 << 2)));
+	while(!(i2cx->SR1 & I2C_SR1_TXE)) {
+		if (--timeout == 0) return I2C_TIMEOUT;
+	}
+
+	return I2C_OK;
 }
 
-void I2C_sendAddr(I2C_TypeDef* i2cx, uint8_t addr)
+I2C_Status I2C_sendAddr(I2C_TypeDef* i2cx, uint8_t addr)
 {
+	uint32_t timeout = I2C_TIMEOUT_VALUE;
 	i2cx->DR = addr;
 
-	while(!(i2cx->SR1 & (1 << 1)));
+	while(!(i2cx->SR1 & I2C_SR1_ADDR)){
+		if(--timeout == 0) return I2C_TIMEOUT;
+	}
 
 	uint8_t temp = i2cx->SR1 | i2cx->SR2; // read SR2 and SR1 (clear ADDR bit)
 	(void)temp;
+
+	return I2C_OK;
 }
 
 void I2C_stop(I2C_TypeDef* i2cx)
