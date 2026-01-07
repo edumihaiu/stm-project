@@ -7,7 +7,9 @@
 
 
 #include "uart_driver.h"
-#include "mpu6050.h"
+#include "stm32f4xx.h"
+
+#define AF7 0x7
 
 void UART_init(void) // USART1 PA9 PA10
 {

@@ -23,7 +23,6 @@ int main(void)
 	leds_init();
 	while(1)
 	{
-		char buffer[10];
 
 		MPU_readXYZ(I2C1, &data);
 		if (data.X > 3000 || data.Y > 3000)

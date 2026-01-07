@@ -1,7 +1,13 @@
-#ifndef I2C_DRIVER_H
-#define I2C_DRIVER_H
+#ifndef I2C_DRIVER_H_
+#define I2C_DRIVER_H_
 
 #include "stm32f4xx.h"
+
+typedef enum {
+	I2C_OK=0,
+	I2C_ERROR=1,
+	I2C_TIMEOUT=2
+} I2C_Status;
 
 void I2C_init(I2C_TypeDef* i2cx);
 void I2C_start(I2C_TypeDef* i2cx);

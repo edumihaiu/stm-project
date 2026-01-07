@@ -6,6 +6,9 @@
  */
 
 #include "leds.h"
+#include "stm32f4xx.h"
+#include "uart_driver.h"
+
 uint8_t led_map[7] = {4, 3, 0, 1, 2, 5, 8};
 void leds_init(void) // portb leds
 {

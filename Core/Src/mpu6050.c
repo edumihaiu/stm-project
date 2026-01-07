@@ -5,10 +5,9 @@
  *      Author: edu
  */
 
-
-#include "stm32f4xx.h"
-#include "i2c_driver.h"
 #include "mpu6050.h"
+#include "i2c_driver.h"
+
 
 
 void MPU_init(I2C_TypeDef* i2cx)

@@ -8,9 +8,12 @@
 #ifndef INC_MPU6050_H_
 #define INC_MPU6050_H_
 
+#include "stm32f4xx.h"
+
 #define MPU_address 0x68
 #define MPU_startRegister 0x3B
 #define MPU_powerMgmtRegister 0x6B
+
 
 typedef struct {
 	int16_t X;
