@@ -36,8 +36,6 @@ void leds_update(float angle)
     uint8_t pin = led_map[index];
     GPIOB->ODR &= ~(0x13F);
 
-
-    // Pasul B: Aprindem DOAR led-ul calculat
-    // Shiftam 1 la stanga cu 'index' pozitii
+    // shift cu index pozitii
     GPIOB->ODR |= (1 << pin);
 }

@@ -83,19 +83,23 @@ void I2C_stop(I2C_TypeDef* i2cx)
 	i2cx->CR1 |= I2C_CR1_STOP;
 }
 
-void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size)
+I2C_Status I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size)
 {
-	slaveAddress = slaveAddress << 1;
+	uint32_t timeout = I2C_TIMEOUT_VALUE;
+
+	//init
+	if(I2C_start(i2cx) != I2C_OK) return I2C_TIMEOUT;
+	if(I2C_sendAddr(i2cx, (slaveAddress << 1)) != I2C_OK) return I2C_TIMEOUT;
+	if (I2C_writeData(i2cx, startReg) != I2C_OK) return I2C_TIMEOUT;
 
 	I2C_start(i2cx);
-	I2C_sendAddr(i2cx, slaveAddress);
-	I2C_writeData(i2cx, startReg);
 
-	I2C_start(i2cx);
+	i2cx->DR = (slaveAddress << 1) | 1;
+	while(!(i2cx->SR1 & I2C_SR1_ADDR)) {
+		if (--timeout == 0) return I2C_TIMEOUT;
+	};
 
-	i2cx->DR = slaveAddress | 1;
-	while(!(i2cx->SR1 & (1 << 1)));
-	i2cx->CR1 |= (1 << 10);
+	i2cx->CR1 |= I2C_CR1_ACK;
 	uint8_t temp = i2cx->SR1 | i2cx->SR2;
 	(void)temp;
 
@@ -104,7 +108,45 @@ void I2C_burstRead(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, ui
 			i2cx->CR1 &= ~(I2C_CR1_ACK); //NACK
 			I2C_stop(i2cx);
 		}
-		while (!(i2cx->SR1 & (1 << 6)));
+
+		timeout = I2C_TIMEOUT_VALUE;
+		while (!(i2cx->SR1 & I2C_SR1_RXNE)) {
+			if(--timeout == 0) return I2C_TIMEOUT;
+		}
+
 		buffer[i] = i2cx->DR;
 	}
+}
+
+I2C_Status I2C_burstRead_DMA(I2C_TypeDef* i2cx, uint8_t slaveAddress, uint8_t startReg, uint8_t* buffer, uint16_t size)
+{
+    uint32_t timeout = I2C_TIMEOUT_VALUE;
+
+    // init
+    if(I2C_start(i2cx) != I2C_OK) return I2C_TIMEOUT;
+    if(I2C_sendAddr(i2cx, slaveAddress << 1) != I2C_OK) return I2C_TIMEOUT;
+    if(I2C_writeData(i2cx, startReg) != I2C_OK) return I2C_TIMEOUT;
+
+    // prepare dma
+    DMA_Config_I2C1_RX(buffer, size);
+
+    // enable i2c dma requests and auto nack
+    i2cx->CR2 |= (I2C_CR2_DMAEN | I2C_CR2_LAST);
+
+    // start read phase
+    if(I2C_start(i2cx) != I2C_OK) return I2C_TIMEOUT;
+
+    i2cx->DR = (slaveAddress << 1) | 1;
+
+    // wait addr flag
+    while(!(i2cx->SR1 & I2C_SR1_ADDR)) {
+        if (--timeout == 0) return I2C_TIMEOUT;
+    }
+    i2cx->CR1 |= I2C_CR1_ACK;
+
+    // clear addr flag
+    uint32_t temp = i2cx->SR1 | i2cx->SR2;
+    (void)temp;
+
+    return I2C_OK;
 }
