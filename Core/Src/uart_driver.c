@@ -33,7 +33,9 @@ void UART_init(void) // USART1 PA9 PA10
 
 	//setting baud rate formula: clock / baud rate
 	USART1->BRR |= (0x683 << 0);
-	USART1-> CR1 = (1 << 2) | (1 << 3) | (1 << 13); // RE | TE | USARTE
+	USART1->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
+	// en DMA
+	USART1->CR3 |= USART_CR3_DMAT;
 }
 
 void UART_write(char c)
@@ -80,3 +82,4 @@ void UART_printXYZ(MPU_axis* data)
 	UART_write('\n');
 	UART_print("-------------\r\n");
 }
+

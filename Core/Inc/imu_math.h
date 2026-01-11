@@ -17,8 +17,14 @@ typedef struct {
 	float pitch;
 } Angles_t;
 
+typedef struct {
+	float sum;
+	uint8_t counter;
+	uint8_t samples_needed;
+} Filter;
 
 void calculateDegrees(Angles_t* angles, int16_t X, int16_t Y, int16_t Z);
-
+void filter_init(Filter* filter, uint32_t num_of_samples_needed);
+uint8_t filter_update(Filter* filter, float new_angle, float* output);
 
 #endif /* INC_IMU_MATH_H_ */

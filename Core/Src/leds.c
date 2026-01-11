@@ -8,6 +8,7 @@
 #include "leds.h"
 #include "stm32f4xx.h"
 #include "uart_driver.h"
+#include <string.h>
 
 uint8_t led_map[7] = {4, 3, 0, 1, 2, 5, 8};
 void leds_init(void) // portb leds
@@ -22,13 +23,17 @@ void leds_init(void) // portb leds
 }
 void leds_update(float angle)
 {
-	UART_print("angle: ");
-	UART_printNumber(angle);
+	if(angle >= 0)
+		angle += 0.5f;
+	else
+		angle -= 0.5f;
+
     if (angle < -90) angle = -90;
     if (angle > 90)  angle = 90;
+
     float step = 2.0f;
 
-    int index = (int)(angle / step) + 3;
+    int index = (int)((int)angle / step) + 3;
 
     if (index > 6) index = 6;
     if (index < 0) index = 0;
@@ -38,4 +43,11 @@ void leds_update(float angle)
 
     // shift cu index pozitii
     GPIOB->ODR |= (1 << pin);
+
+    static char buffer[20];
+    if(!DMA_USART1_IsBusy())
+    {
+    	sprintf(buffer, "Angle: %d", (int)angle);
+    	DMA_Config_USART1_TX(buffer, strlen(buffer));
+    }
 }
