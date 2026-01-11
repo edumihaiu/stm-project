@@ -5,6 +5,7 @@
 	#include "imu_math.h"
 	#include "leds.h"
 	#include "dma_manager.h"
+#include "iwdg_driver.h"
 
 	void FPU_enable(void) {
 		SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
@@ -24,11 +25,14 @@
 		Filter filter;
 
 		filter_init(&filter, 10);
+		IWDG_init();
 		while(1)
 		{
-
+			IWDG_refresh();
 			if(MPU_startReadDMA(I2C1) == I2C_OK) {
-				while(!DMA_I2C1_IsComplete());
+				while(!DMA_I2C1_IsComplete()) {
+					__NOP();
+				}
 				MPU_parseDataDMA(I2C1, &data);
 
 				calculateDegrees(&angles, data.X, data.Y, data.Z);
