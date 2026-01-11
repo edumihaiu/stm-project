@@ -32,7 +32,7 @@ void UART_init(void) // USART1 PA9 PA10
 	GPIOA->AFR[1] |= (AF7 << 8);
 
 	//setting baud rate formula: clock / baud rate
-	USART1->BRR |= (0x683 << 0);
+	USART1->BRR |= (0x8B << 0);
 	USART1->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
 	// en DMA
 	USART1->CR3 |= USART_CR3_DMAT;

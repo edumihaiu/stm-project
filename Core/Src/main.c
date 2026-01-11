@@ -34,7 +34,7 @@
 					__NOP();
 				}
 				MPU_parseDataDMA(I2C1, &data);
-
+				mouse_logic(&data);
 				calculateDegrees(&angles, data.X, data.Y, data.Z);
 				float out;
 				if(filter_update(&filter, angles.roll, &out))

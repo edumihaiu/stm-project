@@ -44,10 +44,4 @@ void leds_update(float angle)
     // shift cu index pozitii
     GPIOB->ODR |= (1 << pin);
 
-    static char buffer[20];
-    if(!DMA_USART1_IsBusy())
-    {
-    	sprintf(buffer, "Angle: %d", (int)angle);
-    	DMA_Config_USART1_TX(buffer, strlen(buffer));
-    }
 }
