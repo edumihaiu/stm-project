@@ -10,6 +10,8 @@
 
 #include "mpu6050.h"
 
+
+void mouse_init(void);
 void mouse_logic(MPU_axis* data);
 
 

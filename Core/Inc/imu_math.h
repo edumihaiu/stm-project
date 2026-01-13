@@ -23,8 +23,19 @@ typedef struct {
 	uint8_t samples_needed;
 } Filter;
 
+typedef struct {
+    float Q_angle;
+    float Q_bias;
+    float R_measure;
+    float angle;
+    float bias;
+    float P[2][2];
+} Kalman_t;
+
 void calculateDegrees(Angles_t* angles, int16_t X, int16_t Y, int16_t Z);
 void filter_init(Filter* filter, uint32_t num_of_samples_needed);
 uint8_t filter_update(Filter* filter, float new_angle, float* output);
+void kalman_init(Kalman_t* filter);
+float kalman_get_angle(Kalman_t* filter, float newAngle, float newRate, float dt);
 
 #endif /* INC_IMU_MATH_H_ */

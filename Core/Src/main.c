@@ -6,6 +6,7 @@
 	#include "leds.h"
 	#include "dma_manager.h"
 #include "iwdg_driver.h"
+#include "mouse_driver.h"
 
 	void FPU_enable(void) {
 		SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
@@ -25,6 +26,7 @@
 		Filter filter;
 
 		filter_init(&filter, 10);
+		mouse_init();
 		IWDG_init();
 		while(1)
 		{
